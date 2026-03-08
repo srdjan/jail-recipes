@@ -1,6 +1,6 @@
-# Jail Recipes
+# JailRun Recipes
 
-This repository is organized as a package-first Jailrun monorepo.
+This repository is organized as a package-first monorepofor [Jailrun](https://github.com/hyphatech/jailrun) playbooks.
 
 ## Layout
 
