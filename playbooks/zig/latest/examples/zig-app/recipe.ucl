@@ -1,0 +1,49 @@
+# recipe.ucl
+#
+# Example: Zig project with build and serve.
+#
+# Canonical package path:
+#   jrun up playbooks/zig/latest/examples/zig-app/recipe.ucl
+#
+# Compatibility alias:
+#   jrun up zig-app.ucl
+#
+# Your Zig project directory is mounted at /srv/app inside the jail.
+# The jail builds and runs your project via `zig build run`.
+#
+# For a build-only workflow (no server), remove the `exec` block
+# and run builds manually:
+#   jrun ssh -j zig-app -- "cd /srv/app && zig build -Doptimize=ReleaseSafe"
+
+jail "hypha-zig" {
+  setup {
+    zig {
+      type = "ansible";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/zig/latest/playbook.yml";
+      vars { ZIG_INSTALL_CTOOLS = "yes"; }
+    }
+  }
+}
+
+jail "zig-app" {
+  base { type = "jail"; name = "hypha-zig"; }
+
+  forward {
+    http { host = 3000; jail = 3000; }
+  }
+  mount {
+    src { host = "."; jail = "/srv/app"; }
+  }
+  exec {
+    server {
+      cmd = "zig build run -- --listen 0.0.0.0:3000";
+      dir = "/srv/app";
+      healthcheck {
+        test = "fetch -qo /dev/null http://127.0.0.1:3000";
+        interval = "30s";
+        timeout = "10s";
+        retries = 5;
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+---
+# jailrun-hub playbook: zig/latest
+#
+# Installs the Zig programming language toolchain on a FreeBSD jail.
+# Zig is installed from the FreeBSD package repository (lang/zig).
+#
+# Variables:
+#   ZIG_CACHE_DIR      - Global cache directory for zig (default: /var/cache/zig)
+#   ZIG_INSTALL_CTOOLS - Install complementary C/C++ build tools (default: "no")
+
+- name: Install Zig toolchain
+  hosts: all
+  become: true
+
+  vars:
+    zig_cache_dir: "{{ ZIG_CACHE_DIR | default('/var/cache/zig') }}"
+    zig_install_ctools: "{{ ZIG_INSTALL_CTOOLS | default('no') }}"
+
+  tasks:
+    - name: Update package repository
+      community.general.pkgng:
+        name: pkg
+        state: present
+
+    - name: Install Zig
+      community.general.pkgng:
+        name: zig
+        state: present
+
+    - name: Install complementary C/C++ build tools
+      community.general.pkgng:
+        name:
+          - cmake
+          - ninja
+          - pkgconf
+          - gmake
+        state: present
+      when: zig_install_ctools | bool
+
+    - name: Create Zig global cache directory
+      ansible.builtin.file:
+        path: "{{ zig_cache_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Set ZIG_GLOBAL_CACHE_DIR environment variable system-wide
+      ansible.builtin.lineinfile:
+        path: /etc/profile
+        line: "export ZIG_GLOBAL_CACHE_DIR={{ zig_cache_dir }}"
+        regexp: "^export ZIG_GLOBAL_CACHE_DIR="
+        state: present
+        create: true
+        mode: "0644"
+
+    - name: Verify Zig installation
+      ansible.builtin.command:
+        cmd: zig version
+      register: zig_version
+      changed_when: false
+
+    - name: Show Zig version
+      ansible.builtin.debug:
+        msg: "Zig {{ zig_version.stdout }}"

@@ -1,0 +1,48 @@
+# recipe.ucl
+#
+# Example: Deno HTTP server with live reload.
+#
+# Canonical package path:
+#   jrun up playbooks/deno/latest/examples/deno-app/recipe.ucl
+#
+# Compatibility alias:
+#   jrun up deno-app.ucl
+#
+# Your project directory is mounted at /srv/app inside the jail.
+# Create a main.ts in your project root:
+#
+#   Deno.serve({ port: 8000 }, (_req) => new Response("Hello from Deno on FreeBSD!"));
+#
+# Then: curl localhost:8000
+
+jail "hypha-deno" {
+  setup {
+    deno {
+      type = "ansible";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/deno/latest/playbook.yml";
+    }
+  }
+}
+
+jail "deno-app" {
+  base { type = "jail"; name = "hypha-deno"; }
+
+  forward {
+    http { host = 8000; jail = 8000; }
+  }
+  mount {
+    src { host = "."; jail = "/srv/app"; }
+  }
+  exec {
+    server {
+      cmd = "deno run --allow-net --allow-read --allow-env --watch /srv/app/main.ts";
+      dir = "/srv/app";
+      healthcheck {
+        test = "fetch -qo /dev/null http://127.0.0.1:8000";
+        interval = "30s";
+        timeout = "10s";
+        retries = 5;
+      }
+    }
+  }
+}

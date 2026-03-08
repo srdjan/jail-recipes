@@ -1,0 +1,82 @@
+# recipe.ucl
+#
+# Example: Deno API gateway backed by a Zig compute service.
+#
+# Canonical package path:
+#   jrun up stacks/deno-zig/latest/recipe.ucl
+#
+# Compatibility alias:
+#   jrun up deno-zig-stack.ucl
+#
+# Architecture:
+#   Host :8000 → deno-api :8000   (TypeScript API, HTTP)
+#   Host :3000 → zig-compute :3000 (Zig native service, HTTP)
+#
+# The Deno API can call the Zig service by jail name:
+#   const resp = await fetch("http://zig-compute:3000/compute");
+
+jail "hypha-deno" {
+  setup {
+    deno {
+      type = "ansible";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/deno/latest/playbook.yml";
+    }
+  }
+}
+
+jail "hypha-zig" {
+  setup {
+    zig {
+      type = "ansible";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/zig/latest/playbook.yml";
+    }
+  }
+}
+
+jail "zig-compute" {
+  base { type = "jail"; name = "hypha-zig"; }
+
+  forward {
+    http { host = 3000; jail = 3000; }
+  }
+  mount {
+    src { host = "./zig-service"; jail = "/srv/app"; }
+  }
+  exec {
+    server {
+      cmd = "zig build run -- --listen 0.0.0.0:3000";
+      dir = "/srv/app";
+      healthcheck {
+        test = "fetch -qo /dev/null http://127.0.0.1:3000/health";
+        interval = "30s";
+        timeout = "10s";
+        retries = 5;
+      }
+    }
+  }
+}
+
+jail "deno-api" {
+  base { type = "jail"; name = "hypha-deno"; }
+
+  depends ["zig-compute"]
+
+  forward {
+    http { host = 8000; jail = 8000; }
+  }
+  mount {
+    src { host = "./deno-api"; jail = "/srv/app"; }
+  }
+  exec {
+    server {
+      cmd = "deno run --allow-net --allow-read --allow-env --watch /srv/app/main.ts";
+      dir = "/srv/app";
+      healthcheck {
+        test = "fetch -qo /dev/null http://127.0.0.1:8000/health";
+        interval = "30s";
+        timeout = "10s";
+        retries = 5;
+      }
+    }
+  }
+}

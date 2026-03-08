@@ -1,0 +1,54 @@
+---
+# jailrun-hub playbook: deno/latest
+#
+# Installs the Deno JavaScript/TypeScript runtime on a FreeBSD jail.
+# Deno is installed from the FreeBSD package repository (www/deno).
+#
+# Variables:
+#   DENO_INSTALL_DIR  - Where to symlink deno (default: /usr/local/bin)
+#   DENO_PERMISSIONS  - Default permissions for deno scripts (default: --allow-read --allow-net)
+#   DENO_DIR          - Cache directory for deno modules (default: /var/cache/deno)
+
+- name: Install Deno runtime
+  hosts: all
+  become: true
+
+  vars:
+    deno_install_dir: "{{ DENO_INSTALL_DIR | default('/usr/local/bin') }}"
+    deno_cache_dir: "{{ DENO_DIR | default('/var/cache/deno') }}"
+
+  tasks:
+    - name: Update package repository
+      community.general.pkgng:
+        name: pkg
+        state: present
+
+    - name: Install Deno
+      community.general.pkgng:
+        name: deno
+        state: present
+
+    - name: Create Deno cache directory
+      ansible.builtin.file:
+        path: "{{ deno_cache_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Set DENO_DIR environment variable system-wide
+      ansible.builtin.lineinfile:
+        path: /etc/profile
+        line: "export DENO_DIR={{ deno_cache_dir }}"
+        regexp: "^export DENO_DIR="
+        state: present
+        create: true
+        mode: "0644"
+
+    - name: Verify Deno installation
+      ansible.builtin.command:
+        cmd: deno --version
+      register: deno_version
+      changed_when: false
+
+    - name: Show Deno version
+      ansible.builtin.debug:
+        msg: "{{ deno_version.stdout_lines }}"
