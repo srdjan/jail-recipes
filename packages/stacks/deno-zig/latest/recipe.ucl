@@ -3,10 +3,7 @@
 # Example: Deno API gateway backed by a Zig compute service.
 #
 # Canonical package path:
-#   jrun up stacks/deno-zig/latest/recipe.ucl
-#
-# Compatibility alias:
-#   jrun up deno-zig-stack.ucl
+#   jrun up packages/stacks/deno-zig/latest/recipe.ucl
 #
 # Architecture:
 #   Host :8000 → deno-api :8000   (TypeScript API, HTTP)
@@ -19,7 +16,7 @@ jail "hypha-deno" {
   setup {
     deno {
       type = "ansible";
-      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/deno/latest/playbook.yml";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/packages/playbooks/deno/latest/playbook.yml";
     }
   }
 }
@@ -28,7 +25,7 @@ jail "hypha-zig" {
   setup {
     zig {
       type = "ansible";
-      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/zig/latest/playbook.yml";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/packages/playbooks/zig/latest/playbook.yml";
     }
   }
 }

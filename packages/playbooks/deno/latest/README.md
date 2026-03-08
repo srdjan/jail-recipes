@@ -21,13 +21,7 @@ Deno is installed from the FreeBSD package repository (`www/deno`), which provid
 ### From this repo (local)
 
 ```sh
-jrun up playbooks/deno/latest/examples/deno-app/recipe.ucl
-```
-
-Compatibility alias:
-
-```sh
-jrun up deno-app.ucl
+jrun up packages/playbooks/deno/latest/examples/deno-app/recipe.ucl
 ```
 
 ### From jailrun-hub (remote)
@@ -37,7 +31,7 @@ jail "hypha-deno" {
   setup {
     deno {
       type = "ansible";
-      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/deno/latest/playbook.yml";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/packages/playbooks/deno/latest/playbook.yml";
     }
   }
 }
@@ -50,7 +44,7 @@ jail "hypha-deno" {
   setup {
     deno {
       type = "ansible";
-      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/deno/latest/playbook.yml";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/packages/playbooks/deno/latest/playbook.yml";
       vars { DENO_DIR = "/srv/app/.deno"; }
     }
   }

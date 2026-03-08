@@ -21,13 +21,7 @@ Zig is installed from the FreeBSD package repository (`lang/zig`), which provide
 ### From this repo (local)
 
 ```sh
-jrun up playbooks/zig/latest/examples/zig-app/recipe.ucl
-```
-
-Compatibility alias:
-
-```sh
-jrun up zig-app.ucl
+jrun up packages/playbooks/zig/latest/examples/zig-app/recipe.ucl
 ```
 
 ### From jailrun-hub (remote)
@@ -37,7 +31,7 @@ jail "hypha-zig" {
   setup {
     zig {
       type = "ansible";
-      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/zig/latest/playbook.yml";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/packages/playbooks/zig/latest/playbook.yml";
     }
   }
 }
@@ -52,7 +46,7 @@ jail "hypha-zig" {
   setup {
     zig {
       type = "ansible";
-      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/zig/latest/playbook.yml";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/packages/playbooks/zig/latest/playbook.yml";
       vars { ZIG_INSTALL_CTOOLS = "yes"; }
     }
   }
@@ -93,7 +87,7 @@ jail "hypha-zig" {
   setup {
     zig {
       type = "ansible";
-      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/zig/latest/playbook.yml";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/packages/playbooks/zig/latest/playbook.yml";
     }
   }
   mount {

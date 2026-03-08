@@ -11,13 +11,7 @@ Composite Jailrun stack package for a Deno API gateway backed by a Zig compute s
 ### From this repo (local)
 
 ```sh
-jrun up stacks/deno-zig/latest/recipe.ucl
-```
-
-Compatibility alias:
-
-```sh
-jrun up deno-zig-stack.ucl
+jrun up packages/stacks/deno-zig/latest/recipe.ucl
 ```
 
 ## Expected project layout

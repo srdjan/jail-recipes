@@ -3,10 +3,7 @@
 # Example: Deno HTTP server with live reload.
 #
 # Canonical package path:
-#   jrun up playbooks/deno/latest/examples/deno-app/recipe.ucl
-#
-# Compatibility alias:
-#   jrun up deno-app.ucl
+#   jrun up packages/playbooks/deno/latest/examples/deno-app/recipe.ucl
 #
 # Your project directory is mounted at /srv/app inside the jail.
 # Create a main.ts in your project root:
@@ -19,7 +16,7 @@ jail "hypha-deno" {
   setup {
     deno {
       type = "ansible";
-      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/playbooks/deno/latest/playbook.yml";
+      url  = "https://github.com/hyphatech/jailrun-hub/blob/main/packages/playbooks/deno/latest/playbook.yml";
     }
   }
 }
